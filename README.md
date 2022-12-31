@@ -11,6 +11,33 @@
 建议Fork自己的一份配置文件，不要直接使用最新的。
 
 ## 自动生成的配置文件
+
+为使用方便，自行编写了一个`Parser`，适用于CFW
+
+所有订阅，更新后会自动生成一个“IP归属地”策略组，并将订阅中原有策略组扔进去，避免了对不同订阅要分别调整的麻烦：
+```yaml
+parsers:
+- reg: ^.*$     ## 匹配所有订阅
+
+  yaml:
+
+    prepend-proxy-groups:
+    - name: 🚩IP归属地
+      type: select
+
+    commands:
+      - proxy-groups.0.proxies=[]groupNames|^((?!IP).)*$
+
+    prepend-rules:
+      - RULE-SET,anti-ip,🚩IP归属地
+      
+    mix-rule-providers:
+       anti-ip: {type: http, behavior: classical, url: "https://cdn.jsdelivr.net/gh/ferristale/anti-ip-attribution/generated/rule-provider.yaml", path: ./Ruleset/anti-ip.yaml, interval: 86400}   
+   
+
+
+```
+
 |                                     文件                                     |                                                            用途                                                             |
 | :--------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------: |
 |                     [parser.yaml](generated/parser.yaml)                     |              适用于Clash for Windows的配置文件预处理功能，详见https://docs.cfw.lbyczf.com/contents/parser.html              |
